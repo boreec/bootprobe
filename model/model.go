@@ -16,6 +16,12 @@ const (
 	RetrievalMethodSystemdAnalyze RetrievalMethod = "systemd_analyze"
 )
 
+var allRetrievalMethods = []RetrievalMethod{
+	RetrievalMethodEFIVar,
+	RetrievalMethodSystemdDBUS,
+	RetrievalMethodSystemdAnalyze,
+}
+
 type BootTimeStage string
 
 const (
@@ -27,8 +33,47 @@ const (
 	BootTimeStageTotal     BootTimeStage = "total"
 )
 
+var allBootTimeStages = []BootTimeStage{
+	BootTimeStageFirmware,
+	BootTimeStageLoader,
+	BootTimeStageKernel,
+	BootTimeStageInitrd,
+	BootTimeStageUserspace,
+	BootTimeStageTotal,
+}
+
 type BootTimeRecord struct {
 	Values map[BootTimeStage]map[RetrievalMethod]time.Duration
+}
+
+func (r BootTimeRecord) ToTable() [][]string {
+	rows := make([][]string, 0, len(allBootTimeStages)+1)
+
+	header := make([]string, 0, len(allRetrievalMethods)+1)
+	header = append(header, "Stage")
+	for _, m := range allRetrievalMethods {
+		header = append(header, string(m))
+	}
+	rows = append(rows, header)
+
+	for _, stage := range allBootTimeStages {
+		row := make([]string, 0, len(allRetrievalMethods)+1)
+		row = append(row, string(stage))
+
+		methods, ok := r.Values[stage]
+		for _, method := range allRetrievalMethods {
+			if ok {
+				if d, exists := methods[method]; exists {
+					row = append(row, d.String())
+					continue
+				}
+			}
+			row = append(row, "")
+		}
+		rows = append(rows, row)
+	}
+
+	return rows
 }
 
 type BootTimeAccumulator struct {

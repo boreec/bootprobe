@@ -21,7 +21,7 @@ func main() {
 	}
 
 	if flags.RunAggregate {
-		if err := exec.PrintRecordsAverage(args.FileName); err != nil {
+		if err := exec.PrintRecordsAverage(args.FileName, flags.Prettify); err != nil {
 			panic(err.Error())
 		}
 	}
@@ -30,6 +30,7 @@ func main() {
 type Flags struct {
 	RunRetrieveBootTime bool
 	RunAggregate        bool
+	Prettify            bool
 }
 
 type Args struct {
@@ -43,6 +44,9 @@ func parseArgs() (*Args, *Flags, error) {
 
 	flag.BoolVar(&flags.RunAggregate, "A", false, "average boot time records")
 	flag.BoolVar(&flags.RunAggregate, "average-boot-records", false, "average boot time records")
+
+	flag.BoolVar(&flags.Prettify, "p", false, "prettify results")
+	flag.BoolVar(&flags.Prettify, "prettify", false, "prettify results")
 	flag.Parse()
 
 	argsUnparsed := flag.Args()

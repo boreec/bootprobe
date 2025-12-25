@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/boreec/boottime/model"
@@ -320,7 +321,7 @@ func RunAnalysis(fileName string) (*model.BootTimeRecord, error) {
 	}, nil
 }
 
-func PrintRecordsAverage(fileName string) error {
+func PrintRecordsAverage(fileName string, pretiffy bool) error {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return fmt.Errorf("opening file %s: %w", fileName, err)
@@ -331,7 +332,6 @@ func PrintRecordsAverage(fileName string) error {
 	if err != nil {
 		return fmt.Errorf("reading boot time records from file: %w", err)
 	}
-	fmt.Printf("records found: %d\n", len(records))
 
 	btra := model.NewBootTimeAccumulator()
 	for _, r := range records {
@@ -339,11 +339,30 @@ func PrintRecordsAverage(fileName string) error {
 	}
 
 	btr := btra.Average()
+
+	if pretiffy {
+		return printRecordsAveragePrettier(btr)
+	}
+
 	btrBytes, err := json.Marshal(&btr)
 	if err != nil {
 		return fmt.Errorf("marshalling averaged results to json: %w", err)
 	}
-
 	fmt.Printf("%s\n", string(btrBytes))
+
 	return nil
+}
+
+func printRecordsAveragePrettier(btr *model.BootTimeRecord) error {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+
+	rows := btr.ToTable()
+	for _, row := range rows {
+		for _, cell := range row {
+			fmt.Fprint(w, cell, "\t")
+		}
+		fmt.Fprintln(w)
+	}
+
+	return w.Flush()
 }
