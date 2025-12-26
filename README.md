@@ -11,13 +11,46 @@ multiple sources.
 
 ## Sources
 
+Boot time information is collected from the following sources:
+- `systemd-analyze time`
+- systemd D-Bus properties
+- EFI variables
+- ACPI
+
+### systemd-analyze time
+
+When available, the program runs `systemd-analyze time` and parses its output to
+extract the **firmware**, **loader**, **kernel**, **initrd**, and **userspace**
+durations.
+
+Note that the durations reported by this command are rounded and truncated for
+human readability ([see the implementation here](https://github.com/systemd/systemd/blob/main/src/analyze/analyze-time-data.c)).
+While this is acceptable for standalone measurements, it results in a loss of
+precision when values are aggregated.
+
+### systemd dbus
+
+The program uses the same D-Bus properties as `systemd-analyze time` to retrieve
+the **firmware**, **loader**, **kernel**, **initrd**, and **userspace** duration
+values directly.
+
+### EFI variables
+
+If present, the following EFI variables can be used to retrieve the **firmware**
+and **loader** duration:
+
+- `LoaderTimeInitUSec-*`
+- `LoaderTimeExecUSec-*`
+
+[More details found here.](https://systemd.io/BOOT_LOADER_INTERFACE/)
+
 ### ACPI
 
 > Modern PCs are horrible. ACPI is a complete design disaster in every way. But we're kind of stuck with it. If any Intel people are listening to this and you had anything to do with ACPI, shoot yourself now, before you reproduce.
 >
 > - **Linus Torvald**, [Linux Journal](http://www.linuxjournal.com/article/7279)
 
-The **firmware** and **boot loader** durations are retrieved from the
+The **firmware** and **loader** durations are retrieved from the
 [FPDT table](https://uefi.org/htmlspecs/ACPI_Spec_6_4_html/05_ACPI_Software_Programming_Model/ACPI_Software_Programming_Model.html#firmware-basic-boot-performance-data-record)
 when available.
 
