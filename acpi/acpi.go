@@ -112,9 +112,9 @@ type BootTimeRecord struct {
 	Loader   time.Duration
 }
 
-// RetrieveBootTimeRecord attempts to read boot times from Sysfs (Kernel 5.12+)
+// RetrieveBootTime attempts to read boot times from Sysfs (Kernel 5.12+)
 // and falls back to reading raw ACPI tables via /dev/mem.
-func RetrieveBootTimeRecord() (*BootTimeRecord, error) {
+func RetrieveBootTime() (*BootTimeRecord, error) {
 	if times, err := retrieveBootTimeWithSysfs(); err == nil {
 		return times, nil
 	}
