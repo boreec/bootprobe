@@ -4,6 +4,7 @@ By order of priority.
 
 - [ ] Make boot time retrieving failure from a source as non-blocking for other 
   sources.
+- [ ] Smart diffs between two jsonl files.
 - [ ] Replace flags with subcommands
 - [ ] Cover aggregation and average logic with tests.
 - [ ] Check other ACPI tables that could be used.
