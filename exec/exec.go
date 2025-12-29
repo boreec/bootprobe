@@ -126,6 +126,7 @@ func PrintRecordsAverage(fileName string, pretiffy bool) error {
 	btr := btra.Average()
 
 	if pretiffy {
+		fmt.Printf("Boot time average for %d records.\n", len(records))
 		return printRecordsAveragePrettier(btr)
 	}
 
