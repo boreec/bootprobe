@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const efivarsPath string = "/sys/firmware/efi/efivars"
+var efivarsPath string = "/sys/firmware/efi/efivars"
 
 type BootTimeRecord struct {
 	Firmware time.Duration

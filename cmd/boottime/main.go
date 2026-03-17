@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/boreec/boottime/exec"
@@ -12,7 +14,8 @@ func main() {
 	var args Args
 	var flags Flags
 
-	if err := parseArgs(&args, &flags); err != nil {
+	fs := flag.NewFlagSet("boottime", flag.ContinueOnError)
+	if err := parseArgs(fs, os.Args[1:], &args, &flags); err != nil {
 		panic(err.Error())
 	}
 
@@ -31,18 +34,21 @@ type Args struct {
 	FileName string
 }
 
-func parseArgs(args *Args, flags *Flags) error {
-	flag.BoolVar(&flags.RunRetrieveBootTime, "R", false, "retrieve boot time")
-	flag.BoolVar(&flags.RunRetrieveBootTime, "retrieve-boot-time", false, "retrieve boot time")
+func parseArgs(fs *flag.FlagSet, argv []string, args *Args, flags *Flags) error {
+	fs.BoolVar(&flags.RunRetrieveBootTime, "R", false, "retrieve boot time")
+	fs.BoolVar(&flags.RunRetrieveBootTime, "retrieve-boot-time", false, "retrieve boot time")
 
-	flag.BoolVar(&flags.RunAggregate, "A", false, "average boot time records")
-	flag.BoolVar(&flags.RunAggregate, "average-boot-records", false, "average boot time records")
+	fs.BoolVar(&flags.RunAggregate, "A", false, "average boot time records")
+	fs.BoolVar(&flags.RunAggregate, "average-boot-records", false, "average boot time records")
 
-	flag.BoolVar(&flags.Prettify, "p", false, "prettify results")
-	flag.BoolVar(&flags.Prettify, "prettify", false, "prettify results")
-	flag.Parse()
+	fs.BoolVar(&flags.Prettify, "p", false, "prettify results")
+	fs.BoolVar(&flags.Prettify, "prettify", false, "prettify results")
 
-	argsUnparsed := flag.Args()
+	if err := fs.Parse(argv); err != nil {
+		return fmt.Errorf("parsing flags: %w", err)
+	}
+
+	argsUnparsed := fs.Args()
 	if len(argsUnparsed) == 0 {
 		return errors.New("expected 1 arg for jsonl file, found 0")
 	}

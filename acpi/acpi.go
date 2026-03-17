@@ -14,8 +14,9 @@ import (
 	"time"
 )
 
-const (
-	tableHeaderSize   int    = 36
+const tableHeaderSize int = 36
+
+var (
 	pathDevMem        string = "/dev/mem"
 	pathFPDTBootDir   string = "/sys/firmware/acpi/fpdt/boot/"
 	pathFPDTTableFile string = "/sys/firmware/acpi/tables/FPDT"

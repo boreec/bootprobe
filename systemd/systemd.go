@@ -69,6 +69,10 @@ func RetrieveBootTimeWithDbus() (*BootTimeRecord, error) {
 		}
 	}
 
+	return computeDbusBootTime(firmwareTs, loaderTs, initrdTs, userspaceTs, finishTs)
+}
+
+func computeDbusBootTime(firmwareTs, loaderTs, initrdTs, userspaceTs, finishTs uint64) (*BootTimeRecord, error) {
 	if finishTs == 0 {
 		return nil, errors.New("bootup is not yet finished")
 	}

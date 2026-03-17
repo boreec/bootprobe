@@ -3,6 +3,7 @@ package exec
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"text/tabwriter"
 	"time"
@@ -127,7 +128,7 @@ func PrintRecordsAverage(fileName string, pretiffy bool) error {
 
 	if pretiffy {
 		fmt.Printf("Boot time average for %d records.\n", len(records))
-		return printRecordsAveragePrettier(btr)
+		return printRecordsAveragePrettier(os.Stdout, btr)
 	}
 
 	btrBytes, err := json.Marshal(&btr)
@@ -139,8 +140,8 @@ func PrintRecordsAverage(fileName string, pretiffy bool) error {
 	return nil
 }
 
-func printRecordsAveragePrettier(btr *model.BootTimeRecord) error {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+func printRecordsAveragePrettier(out io.Writer, btr *model.BootTimeRecord) error {
+	w := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
 
 	rows := btr.ToTable()
 	for _, row := range rows {
